@@ -3,11 +3,8 @@
 
 const byte REQUEST_START_FLAG = 0xA6;
 const byte REQUEST_IS_READY = 0x01;
-const byte REQUEST_CONFIG = 0x02;
-const byte REQUEST_OPEN = 0x03;
-const byte REQUEST_CLOSE = 0x04;
-const byte REQUEST_LIFT = 0x05;
-const byte REQUEST_LOWER = 0x06;
+const byte REQUEST_JAW_ANGLE = 0x02;
+const byte REQUEST_LIFT_ANGLE = 0x03;
 
 const byte RESPONSE_START_FLAG_1 = 0xA6;
 const byte RESPONSE_START_FLAG_2 = 0x6A;
@@ -16,14 +13,9 @@ const byte RESPONSE_READY = 0xFF;
 const int JAW_SERVO_PIN = 9;
 const int LIFT_SERVO_PIN = 10;
 
-int jawCloseAngle = 0;
-int jawOpenAngle = 0;
-int liftUpAngle = 0;
-int liftDownAngle = 0;
-
+PacketSerial serial;
 Servo jaws;
 Servo lift;
-PacketSerial serial;
 
 /**
  * Send the ready response
@@ -50,39 +42,14 @@ void onPacketReceived(const uint8_t* buffer, size_t size) {
 
   if (startFlag == REQUEST_START_FLAG) {
     switch (command) {
-      case REQUEST_CONFIG: {
-        jawCloseAngle = buffer[2];
-        jawOpenAngle = buffer[3];
-        liftUpAngle = buffer[4];
-        liftDownAngle = buffer[5];
+
+      case REQUEST_JAW_ANGLE: {
+        jaws.write(constrain(buffer[2], 0, 180));
         break;
       }
 
-      case REQUEST_OPEN: {
-        if (jawOpenAngle != 0) {
-          jaws.write(jawOpenAngle);
-        }
-        break;
-      }
-
-      case REQUEST_CLOSE: {
-        if (jawCloseAngle != 0) {
-          jaws.write(jawCloseAngle);
-        }
-        break;
-      }
-
-      case REQUEST_LIFT: {
-        if (liftUpAngle != 0) {
-          lift.write(liftUpAngle);
-        }
-        break;
-      }
-
-      case REQUEST_LOWER: {
-        if (liftDownAngle != 0) {
-          lift.write(liftDownAngle);
-        }
+      case REQUEST_LIFT_ANGLE: {
+        lift.write(constrain(buffer[2], 0, 180));
         break;
       }
 

@@ -17,45 +17,26 @@ Firmware to manage two servo motors with an Arduino Nano communicating over USB 
 
 ### Requests Overview
 
-| Request  | Value  | Payload                                                                                              |
-|----------|--------|------------------------------------------------------------------------------------------------------|
-| IS_READY | `0x01` | N/A                                                                                                  |
-| CONFIG   | `0x02` | jaw open angle (1 byte), jaw close angle (1 byte), lift lower angle (1 byte), lift up angle (1 byte) |
-| OPEN     | `0x03` | N/A                                                                                                  |
-| CLOSE    | `0x04` | N/A                                                                                                  |
-| LIFT     | `0x05` | N/A                                                                                                  |
-| LOWER    | `0x06` | N/A                                                                                                  |
+| Request        | Value  | Payload |
+|----------------|--------|---------|
+| IS_READY       | `0x01` | N/A     |
+| SET_JAW_ANGLE  | `0x02` | N/A     |
+| SET_LIFT_ANGLE | `0x03` | N/A     |
 
 #### Is ready Request
 Request: `0xA6` `0x01`
 
 Triggers the ready response to make sure the Arduino is ready for operation.
 
-#### Config Request
-Request: `0xA6` `0x02` `0x[jaw open angle]` `0x[jaw close angle]` `0x[lift lower angle]` `0x[lift up angle]`
+#### Set Jaw Angle Request
+Request `0xA6` `0x02` `0x[angle]`
 
-Triggers the ready response to make sure the Arduino is ready for operation.
+Sets the jaw servo to the given angle
 
-#### Open Request
-Request `0xA6` `0x03`
+#### Set Lift Angle Request
+Request `0xA6` `0x03` `0x[angle]`
 
-Sets the jaw servo to the configured angle
-
-#### Close Request
-Request `0xA6` `0x04`
-
-Sets the jaw servo to the configured angle
-
-#### Lift Request
-Request `0xA6` `0x05`
-
-Sets the lift servo to the configured angle
-
-#### Lower Request
-Request `0xA6` `0x06`
-
-Sets the lift servo to the configured angle
-
+Sets the jaw servo to the given angle
 
 ### Responses Overview
 
