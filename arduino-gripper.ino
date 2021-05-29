@@ -10,8 +10,8 @@ const byte RESPONSE_START_FLAG_1 = 0xA6;
 const byte RESPONSE_START_FLAG_2 = 0x6A;
 const byte RESPONSE_READY = 0xFF;
 
-const int JAW_SERVO_PIN = 9;
-const int LIFT_SERVO_PIN = 10;
+const int JAW_SERVO_PIN = 7;
+const int LIFT_SERVO_PIN = 8;
 
 PacketSerial serial;
 Servo jaws;
