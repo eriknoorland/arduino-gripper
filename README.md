@@ -17,11 +17,11 @@ Firmware to manage two servo motors with an Arduino Nano communicating over USB 
 
 ### Requests Overview
 
-| Request        | Value  | Payload |
-|----------------|--------|---------|
-| IS_READY       | `0x01` | N/A     |
-| SET_JAW_ANGLE  | `0x02` | N/A     |
-| SET_LIFT_ANGLE | `0x03` | N/A     |
+| Request        | Value  | Payload                            |
+|----------------|--------|------------------------------------|
+| IS_READY       | `0x01` | N/A                                |
+| SET_JAW_ANGLE  | `0x02` | angle (1 byte), duration (2 bytes) |
+| SET_LIFT_ANGLE | `0x03` | angle (1 byte), duration (2 bytes) |
 
 #### Is ready Request
 Request: `0xA6` `0x01`
@@ -29,14 +29,14 @@ Request: `0xA6` `0x01`
 Triggers the ready response to make sure the Arduino is ready for operation.
 
 #### Set Jaw Angle Request
-Request `0xA6` `0x02` `0x[angle]`
+Request `0xA6` `0x02` `0x[angle] 0x[duration 15:8] 0x[duration 7:0]`
 
-Sets the jaw servo to the given angle
+Sets the jaw servo to the given angle in the given duration time
 
 #### Set Lift Angle Request
-Request `0xA6` `0x03` `0x[angle]`
+Request `0xA6` `0x03` `0x[angle] 0x[duration 15:8] 0x[duration 7:0`
 
-Sets the jaw servo to the given angle
+Sets the jaw servo to the given angle in the given duration time
 
 ### Responses Overview
 

@@ -1,5 +1,6 @@
 #include "Servo.h"
 #include "PacketSerial.h"
+#include "Ramp.h"
 
 const byte REQUEST_START_FLAG = 0xA6;
 const byte REQUEST_IS_READY = 0x01;
@@ -14,8 +15,15 @@ const int JAW_SERVO_PIN = 7;
 const int LIFT_SERVO_PIN = 8;
 
 PacketSerial serial;
-Servo jaws;
+
+Servo jaw;
 Servo lift;
+
+rampInt jawRamp;
+rampInt liftRamp;
+
+int lastJawAngle = 90;
+int lastLiftAngle = 90;
 
 /**
  * Send the ready response
@@ -44,12 +52,18 @@ void onPacketReceived(const uint8_t* buffer, size_t size) {
     switch (command) {
 
       case REQUEST_JAW_ANGLE: {
-        jaws.write(constrain(buffer[2], 0, 180));
+        int jawAngle = constrain(buffer[2], 0, 180);
+        int jawDuration = (buffer[3] << 8) + buffer[4];
+
+        jawRamp.go(jawAngle, jawDuration, LINEAR);
         break;
       }
 
       case REQUEST_LIFT_ANGLE: {
-        lift.write(constrain(buffer[2], 0, 180));
+        int liftAngle = constrain(buffer[2], 0, 180);
+        int liftDuration = (buffer[3] << 8) + buffer[4];
+
+        liftRamp.go(liftAngle, liftDuration, LINEAR);
         break;
       }
 
@@ -70,8 +84,11 @@ void setup() {
   serial.setStream(&Serial);
   serial.setPacketHandler(&onPacketReceived);
 
+  jaw.attach(JAW_SERVO_PIN);
   lift.attach(LIFT_SERVO_PIN);
-  jaws.attach(JAW_SERVO_PIN);
+
+  jawRamp.go(90);
+  liftRamp.go(90);
 
   while (!Serial) {}
 
@@ -83,4 +100,18 @@ void setup() {
  */
 void loop() {
   serial.update();
+
+  int liftAngle = liftRamp.update();
+  int jawAngle = jawRamp.update();
+
+  if (liftAngle != lastLiftAngle) {
+    lift.write(liftAngle);
+  }
+
+  if (jawAngle != lastJawAngle) {
+    jaw.write(jawAngle);
+  }
+
+  lastJawAngle = jawAngle;
+  lastLiftAngle = liftAngle;
 }
