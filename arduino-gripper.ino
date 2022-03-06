@@ -25,10 +25,21 @@ rampInt liftRamp;
 int lastJawAngle = 90;
 int lastLiftAngle = 90;
 
+bool isReady = false;
+
+/**
+ * Send the identifier response
+ */
+void responseIdentifier() {
+  uint8_t identifierResponse[7] = { 0x67, 0x72, 0x69, 0x70, 0x70, 0x65, 0x72 }; // spells 'gripper'
+
+  serial.send(identifierResponse, sizeof(identifierResponse));
+}
+
 /**
  * Send the ready response
  */
-void isReady() {
+void responseReady() {
   uint8_t readyResponse[4] = {
     RESPONSE_START_FLAG_1,
     RESPONSE_START_FLAG_2,
@@ -37,6 +48,7 @@ void isReady() {
   };
 
   serial.send(readyResponse, sizeof(readyResponse));
+  isReady = true;
 }
 
 /**
@@ -68,10 +80,12 @@ void onPacketReceived(const uint8_t* buffer, size_t size) {
       }
 
       case REQUEST_IS_READY: {
-        isReady();
+        responseReady();
         break;
       }
     }
+  } else if (startFlag == 0xAA && command == 0xAA && buffer[2] == 0xAA && buffer[3] == 0xAA) {
+    responseIdentifier();
   }
 }
 
@@ -91,8 +105,6 @@ void setup() {
   liftRamp.go(90);
 
   while (!Serial) {}
-
-  isReady();
 }
 
 /**
@@ -100,6 +112,10 @@ void setup() {
  */
 void loop() {
   serial.update();
+
+  if (!isReady) {
+    return;
+  }
 
   int liftAngle = liftRamp.update();
   int jawAngle = jawRamp.update();
